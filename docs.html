@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EasyLang Docs — Language Reference</title>
+  <meta name="description" content="Complete EasyLang language reference. Learn variables, loops, functions, lists, built-ins, and more.">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .docs-content { max-width: 800px; }
+    .docs-content h2 { margin: 2.5rem 0 0.8rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 1.6rem; }
+    .docs-content h2:first-child { border-top: none; margin-top: 0; }
+    .docs-content h3 { margin: 1.5rem 0 0.6rem; font-size: 1.1rem; color: var(--text-accent); }
+    .docs-content p { margin-bottom: 0.75rem; }
+    .docs-content ul, .docs-content ol { margin: 0.5rem 0 1rem 1.5rem; color: var(--text-secondary); line-height: 1.8; }
+    .docs-content .code-block { margin: 0.75rem 0 1.25rem; }
+
+    .kw-table { width:100%; border-collapse:collapse; margin:0.75rem 0 1.5rem; font-size:0.875rem; }
+    .kw-table th { text-align:left; padding:0.5rem 0.75rem; background:rgba(124,58,237,0.12); color:var(--text-accent); font-weight:600; border-bottom:1px solid var(--border); }
+    .kw-table td { padding:0.5rem 0.75rem; border-bottom:1px solid rgba(255,255,255,0.04); color:var(--text-secondary); }
+    .kw-table td:first-child { font-family:var(--font-mono); color:#a78bfa; font-size:0.82rem; }
+    .kw-table tr:hover td { background:var(--bg-glass); }
+
+    .try-btn {
+      font-size:0.75rem; padding:0.25rem 0.7rem;
+      background:rgba(124,58,237,0.15); border:1px solid rgba(124,58,237,0.3);
+      border-radius:var(--radius-full); color:var(--text-accent);
+      cursor:pointer; font-family:var(--font-sans); font-weight:600;
+      transition:all var(--transition); text-decoration:none;
+    }
+    .try-btn:hover { background:rgba(124,58,237,0.25); color:var(--text-accent); }
+
+    .search-box {
+      width:100%; padding:0.65rem 1rem;
+      background:var(--bg-glass); border:1px solid var(--border);
+      border-radius:var(--radius-md); color:var(--text-primary);
+      font-family:var(--font-sans); font-size:0.9rem;
+      outline:none; margin-bottom:1.5rem;
+      transition:border-color var(--transition);
+    }
+    .search-box:focus { border-color:var(--accent-purple); }
+    .search-box::placeholder { color:var(--text-muted); }
+
+    .doc-section { display:block; }
+    .doc-section.hidden { display:none; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="navbar-brand"><div class="logo-icon">E</div>EasyLang</a>
+  <ul class="navbar-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="editor.html">Editor</a></li>
+    <li><a href="docs.html" class="active">Docs</a></li>
+    <li><a href="examples.html">Examples</a></li>
+  </ul>
+  <a href="editor.html" class="btn btn-primary">▶ Try It</a>
+</nav>
+
+<div class="page-wrapper">
+  <div class="container section">
+
+    <div class="section-label">📖 Documentation</div>
+    <h1 style="margin-bottom:0.5rem">Language <span class="text-gradient">Reference</span></h1>
+    <p style="margin-bottom:2rem;font-size:1.05rem">Everything you need to master EasyLang, from your first variable to recursive functions.</p>
+
+    <input type="text" class="search-box" id="doc-search" placeholder="🔍 Search documentation..." oninput="searchDocs(this.value)">
+
+    <div class="docs-layout">
+      <!-- Sidebar -->
+      <aside class="docs-sidebar">
+        <div class="docs-nav-title">Contents</div>
+        <nav class="docs-nav">
+          <ul>
+            <li><a href="#getting-started" onclick="scrollTo('getting-started')">Getting Started</a></li>
+            <li><a href="#variables">Variables</a></li>
+            <li><a href="#output">Output</a></li>
+            <li><a href="#types">Types</a></li>
+            <li><a href="#operators">Operators</a></li>
+            <li><a href="#conditionals">Conditionals</a></li>
+            <li><a href="#loops">Loops</a></li>
+            <li><a href="#functions">Functions</a></li>
+            <li><a href="#lists">Lists</a></li>
+            <li><a href="#builtins">Built-ins</a></li>
+            <li><a href="#errors">Error Reference</a></li>
+          </ul>
+        </nav>
+      </aside>
+
+      <!-- Content -->
+      <div class="docs-content">
+
+        <!-- Getting Started -->
+        <div class="doc-section" id="getting-started">
+          <h2>Getting Started</h2>
+          <p>EasyLang runs entirely in your browser. Open the <a href="editor.html">Editor</a>, type your first program, and press <kbd style="background:var(--bg-glass);border:1px solid var(--border);padding:0.1rem 0.4rem;border-radius:4px;font-family:var(--font-mono)">Ctrl+Enter</kbd> or click <strong>▶ Run</strong>.</p>
+          <h3>Your First Program</h3>
+          <div class="code-block">
+<span class="kw">say</span> <span class="str">"Hello, World!"</span>
+          </div>
+          <p>That's it. No imports, no main function, no semicolons. One line → one output.</p>
+          <h3>Comments</h3>
+          <div class="code-block">
+<span class="cmt"># This is a comment — it won't run</span>
+<span class="kw">say</span> <span class="str">"This will run"</span>  <span class="cmt"># inline comment too</span>
+          </div>
+        </div>
+
+        <!-- Variables -->
+        <div class="doc-section" id="variables">
+          <h2>Variables</h2>
+          <p>Create a variable with <code>set ... to ...</code>. Variables don't need a type — EasyLang figures it out.</p>
+          <div class="code-block">
+<span class="kw">set</span> name <span class="kw">to</span> <span class="str">"Alice"</span>
+<span class="kw">set</span> age <span class="kw">to</span> <span class="num">25</span>
+<span class="kw">set</span> score <span class="kw">to</span> <span class="num">98.5</span>
+<span class="kw">set</span> active <span class="kw">to</span> true
+<span class="kw">set</span> nothing <span class="kw">to</span> null
+<br>
+<span class="cmt"># Reassign anytime</span>
+<span class="kw">set</span> age <span class="kw">to</span> age + <span class="num">1</span>
+<span class="kw">say</span> age
+          </div>
+          <p>Variable names are case-sensitive: <code>score</code> and <code>Score</code> are different.</p>
+        </div>
+
+        <!-- Output -->
+        <div class="doc-section" id="output">
+          <h2>Output</h2>
+          <p>Use <code>say</code> (or <code>print</code>) to print anything to the output console.</p>
+          <div class="code-block">
+<span class="kw">say</span> <span class="str">"Hello!"</span>
+<span class="kw">say</span> <span class="num">42</span>
+<span class="kw">say</span> <span class="num">3.14</span>
+<span class="kw">say</span> true
+<span class="kw">say</span> <span class="str">"Name: "</span> + name      <span class="cmt"># concatenation</span>
+<span class="kw">say</span> <span class="str">"Sum: "</span> + (a + b)   <span class="cmt"># use parens for clarity</span>
+          </div>
+        </div>
+
+        <!-- Types -->
+        <div class="doc-section" id="types">
+          <h2>Types</h2>
+          <table class="kw-table">
+            <tr><th>Type</th><th>Examples</th><th>Notes</th></tr>
+            <tr><td>number</td><td>42, 3.14, -7</td><td>All numbers are floating-point</td></tr>
+            <tr><td>string</td><td>"hello", 'world'</td><td>Single or double quotes both work</td></tr>
+            <tr><td>boolean</td><td>true, false, yes, no</td><td>yes/no are aliases for true/false</td></tr>
+            <tr><td>null</td><td>null</td><td>Represents "nothing"</td></tr>
+            <tr><td>list</td><td>list 1, 2, 3</td><td>Ordered collection of any type</td></tr>
+          </table>
+          <h3>Type Checking</h3>
+          <div class="code-block">
+<span class="kw">set</span> x <span class="kw">to</span> <span class="num">42</span>
+<span class="kw">say</span> type <span class="kw">of</span> x          <span class="cmt"># number</span>
+<span class="kw">say</span> type <span class="kw">of</span> <span class="str">"hello"</span>   <span class="cmt"># string</span>
+<span class="kw">say</span> type <span class="kw">of</span> true       <span class="cmt"># boolean</span>
+          </div>
+          <h3>Type Conversion</h3>
+          <div class="code-block">
+<span class="kw">say</span> string <span class="kw">of</span> <span class="num">42</span>      <span class="cmt"># "42"</span>
+<span class="kw">say</span> number <span class="kw">of</span> <span class="str">"7"</span>     <span class="cmt"># 7</span>
+          </div>
+        </div>
+
+        <!-- Operators -->
+        <div class="doc-section" id="operators">
+          <h2>Operators</h2>
+          <h3>Arithmetic</h3>
+          <table class="kw-table">
+            <tr><th>Operator</th><th>Meaning</th><th>Example</th></tr>
+            <tr><td>+</td><td>Addition / concat</td><td>3 + 4 → 7</td></tr>
+            <tr><td>-</td><td>Subtraction</td><td>10 - 3 → 7</td></tr>
+            <tr><td>*</td><td>Multiplication</td><td>3 * 4 → 12</td></tr>
+            <tr><td>/</td><td>Division</td><td>10 / 4 → 2.5</td></tr>
+            <tr><td>%</td><td>Remainder (modulo)</td><td>10 % 3 → 1</td></tr>
+            <tr><td>^</td><td>Power</td><td>2 ^ 8 → 256</td></tr>
+          </table>
+          <h3>Comparison</h3>
+          <table class="kw-table">
+            <tr><th>Operator</th><th>Meaning</th></tr>
+            <tr><td>==</td><td>Equal to</td></tr>
+            <tr><td>!=</td><td>Not equal to</td></tr>
+            <tr><td>&lt;</td><td>Less than</td></tr>
+            <tr><td>&lt;=</td><td>Less than or equal</td></tr>
+            <tr><td>&gt;</td><td>Greater than</td></tr>
+            <tr><td>&gt;=</td><td>Greater than or equal</td></tr>
+          </table>
+          <h3>Logical</h3>
+          <div class="code-block">
+<span class="kw">if</span> age &gt; <span class="num">18</span> <span class="kw">and</span> age &lt; <span class="num">65</span>
+  <span class="kw">say</span> <span class="str">"Working age"</span>
+<span class="kw">end</span>
+
+<span class="kw">if</span> score &gt; <span class="num">90</span> <span class="kw">or</span> bonus == true
+  <span class="kw">say</span> <span class="str">"Great result!"</span>
+<span class="kw">end</span>
+
+<span class="kw">if</span> <span class="kw">not</span> active
+  <span class="kw">say</span> <span class="str">"Inactive"</span>
+<span class="kw">end</span>
+          </div>
+        </div>
+
+        <!-- Conditionals -->
+        <div class="doc-section" id="conditionals">
+          <h2>Conditionals</h2>
+          <p>Use <code>if</code> / <code>elseif</code> / <code>else</code> / <code>end</code> for branching.</p>
+          <div class="code-block">
+<span class="kw">set</span> grade <span class="kw">to</span> <span class="num">72</span>
+
+<span class="kw">if</span> grade &gt;= <span class="num">90</span>
+  <span class="kw">say</span> <span class="str">"A"</span>
+<span class="kw">elseif</span> grade &gt;= <span class="num">80</span>
+  <span class="kw">say</span> <span class="str">"B"</span>
+<span class="kw">elseif</span> grade &gt;= <span class="num">70</span>
+  <span class="kw">say</span> <span class="str">"C"</span>
+<span class="kw">else</span>
+  <span class="kw">say</span> <span class="str">"Below C"</span>
+<span class="kw">end</span>
+          </div>
+          <p>Every <code>if</code> must be closed with <code>end</code>. Nesting is supported.</p>
+        </div>
+
+        <!-- Loops -->
+        <div class="doc-section" id="loops">
+          <h2>Loops</h2>
+          <h3>repeat — Simple repetition</h3>
+          <div class="code-block">
+<span class="kw">repeat</span> <span class="num">5</span>
+  <span class="kw">say</span> <span class="str">"Hello!"</span>
+<span class="kw">end</span>
+          </div>
+          <h3>loop from/to — Range loop</h3>
+          <div class="code-block">
+<span class="kw">loop</span> i <span class="kw">from</span> <span class="num">1</span> <span class="kw">to</span> <span class="num">10</span>
+  <span class="kw">say</span> i
+<span class="kw">end</span>
+
+<span class="cmt"># Countdown</span>
+<span class="kw">loop</span> i <span class="kw">from</span> <span class="num">10</span> <span class="kw">to</span> <span class="num">1</span>
+  <span class="kw">say</span> i
+<span class="kw">end</span>
+
+<span class="cmt"># Custom step</span>
+<span class="kw">loop</span> i <span class="kw">from</span> <span class="num">0</span> <span class="kw">to</span> <span class="num">20</span> <span class="kw">with</span> <span class="num">5</span>
+  <span class="kw">say</span> i
+<span class="kw">end</span>
+          </div>
+          <h3>while — Condition loop</h3>
+          <div class="code-block">
+<span class="kw">set</span> n <span class="kw">to</span> <span class="num">1</span>
+<span class="kw">while</span> n &lt;= <span class="num">100</span>
+  <span class="kw">set</span> n <span class="kw">to</span> n * <span class="num">2</span>
+<span class="kw">end</span>
+<span class="kw">say</span> n
+          </div>
+          <h3>stop — Break out of a loop</h3>
+          <div class="code-block">
+<span class="kw">loop</span> i <span class="kw">from</span> <span class="num">1</span> <span class="kw">to</span> <span class="num">100</span>
+  <span class="kw">if</span> i == <span class="num">5</span>
+    <span class="kw">stop</span>
+  <span class="kw">end</span>
+  <span class="kw">say</span> i
+<span class="kw">end</span>
+          </div>
+        </div>
+
+        <!-- Functions -->
+        <div class="doc-section" id="functions">
+          <h2>Functions</h2>
+          <p>Define reusable blocks with <code>define</code> and call them with <code>call</code>.</p>
+          <div class="code-block">
+<span class="cmt"># Define a function</span>
+<span class="kw">define</span> <span class="fn">greet</span> <span class="kw">with</span> name
+  <span class="kw">say</span> <span class="str">"Hello, "</span> + name + <span class="str">"!"</span>
+<span class="kw">end</span>
+
+<span class="cmt"># Call it</span>
+<span class="kw">call</span> <span class="fn">greet</span> <span class="kw">with</span> <span class="str">"Alice"</span>
+<span class="kw">call</span> <span class="fn">greet</span> <span class="kw">with</span> <span class="str">"Bob"</span>
+
+<span class="cmt"># Return a value</span>
+<span class="kw">define</span> <span class="fn">multiply</span> <span class="kw">with</span> a, b
+  <span class="kw">return</span> a * b
+<span class="kw">end</span>
+
+<span class="kw">set</span> result <span class="kw">to</span> multiply <span class="kw">with</span> <span class="num">6</span>, <span class="num">7</span>
+<span class="kw">say</span> result   <span class="cmt"># 42</span>
+
+<span class="cmt"># No parameters needed</span>
+<span class="kw">define</span> <span class="fn">divider</span>
+  <span class="kw">say</span> <span class="str">"──────────────"</span>
+<span class="kw">end</span>
+<span class="kw">call</span> <span class="fn">divider</span>
+          </div>
+          <p>Functions support recursion — they can call themselves!</p>
+        </div>
+
+        <!-- Lists -->
+        <div class="doc-section" id="lists">
+          <h2>Lists</h2>
+          <div class="code-block">
+<span class="cmt"># Create</span>
+<span class="kw">set</span> fruits <span class="kw">to</span> <span class="kw">list</span> <span class="str">"apple"</span>, <span class="str">"banana"</span>, <span class="str">"cherry"</span>
+<span class="kw">set</span> empty <span class="kw">to</span> <span class="kw">list</span>
+
+<span class="cmt"># Access by index (0-based)</span>
+<span class="kw">say</span> fruits[<span class="num">0</span>]     <span class="cmt"># apple</span>
+<span class="kw">say</span> fruits[<span class="num">2</span>]     <span class="cmt"># cherry</span>
+<span class="kw">say</span> fruits[-<span class="num">1</span>]    <span class="cmt"># last item</span>
+
+<span class="cmt"># Modify</span>
+<span class="kw">add</span> <span class="str">"mango"</span> <span class="kw">to</span> fruits
+<span class="kw">remove</span> <span class="str">"banana"</span> <span class="kw">from</span> fruits
+
+<span class="cmt"># Properties</span>
+<span class="kw">say</span> length <span class="kw">of</span> fruits
+<span class="kw">say</span> first <span class="kw">of</span> fruits
+<span class="kw">say</span> last <span class="kw">of</span> fruits
+<span class="kw">say</span> sorted <span class="kw">of</span> fruits
+<span class="kw">say</span> reverse <span class="kw">of</span> fruits
+<span class="kw">say</span> join <span class="kw">of</span> fruits
+
+<span class="cmt"># Loop over list</span>
+<span class="kw">loop</span> i <span class="kw">from</span> <span class="num">0</span> <span class="kw">to</span> (length <span class="kw">of</span> fruits) - <span class="num">1</span>
+  <span class="kw">say</span> fruits[i]
+<span class="kw">end</span>
+          </div>
+        </div>
+
+        <!-- Built-ins -->
+        <div class="doc-section" id="builtins">
+          <h2>Built-in Operations</h2>
+          <p>All built-ins use the <code>X of Y</code> pattern:</p>
+          <table class="kw-table">
+            <tr><th>Built-in</th><th>Input</th><th>Output</th></tr>
+            <tr><td>length of X</td><td>string/list</td><td>Character/item count</td></tr>
+            <tr><td>uppercase of X</td><td>string</td><td>All caps</td></tr>
+            <tr><td>lowercase of X</td><td>string</td><td>All lowercase</td></tr>
+            <tr><td>type of X</td><td>any</td><td>"number", "string", "boolean", "list"</td></tr>
+            <tr><td>floor of X</td><td>number</td><td>Round down</td></tr>
+            <tr><td>ceil of X</td><td>number</td><td>Round up</td></tr>
+            <tr><td>round of X</td><td>number</td><td>Round to nearest</td></tr>
+            <tr><td>abs of X</td><td>number</td><td>Absolute value</td></tr>
+            <tr><td>sqrt of X</td><td>number</td><td>Square root</td></tr>
+            <tr><td>random of X</td><td>number N</td><td>Random integer in [0, N)</td></tr>
+            <tr><td>first of X</td><td>list/string</td><td>First element</td></tr>
+            <tr><td>last of X</td><td>list/string</td><td>Last element</td></tr>
+            <tr><td>reverse of X</td><td>list/string</td><td>Reversed copy</td></tr>
+            <tr><td>sorted of X</td><td>list</td><td>Sorted copy</td></tr>
+            <tr><td>sum of X</td><td>list of numbers</td><td>Total</td></tr>
+            <tr><td>string of X</td><td>any</td><td>Convert to string</td></tr>
+            <tr><td>number of X</td><td>string</td><td>Convert to number</td></tr>
+            <tr><td>join of X</td><td>list</td><td>Join items with ", "</td></tr>
+          </table>
+          <h3>Math Constants</h3>
+          <div class="code-block">
+<span class="kw">say</span> pi   <span class="cmt"># 3.14159...</span>
+<span class="kw">say</span> e    <span class="cmt"># 2.71828...</span>
+          </div>
+        </div>
+
+        <!-- Errors -->
+        <div class="doc-section" id="errors">
+          <h2>Error Reference</h2>
+          <table class="kw-table">
+            <tr><th>Error Type</th><th>Cause</th><th>Fix</th></tr>
+            <tr><td>LexerError</td><td>Unrecognized character</td><td>Check for stray symbols or typos</td></tr>
+            <tr><td>ParseError</td><td>Missing keyword (e.g. 'end')</td><td>Every if/loop/define needs an 'end'</td></tr>
+            <tr><td>RuntimeError</td><td>Variable not defined</td><td>Use 'set x to ...' before using x</td></tr>
+            <tr><td>RuntimeError</td><td>Divide by zero</td><td>Check your divisor first</td></tr>
+            <tr><td>RuntimeError</td><td>Wrong argument count</td><td>Match the number of parameters in 'define'</td></tr>
+            <tr><td>RuntimeError</td><td>Index out of bounds</td><td>List index must be ≥ 0 and < length</td></tr>
+            <tr><td>RuntimeError</td><td>Infinite loop</td><td>Check your loop condition — it may never end</td></tr>
+          </table>
+        </div>
+
+      </div><!-- /docs-content -->
+    </div><!-- /docs-layout -->
+
+  </div><!-- /container -->
+
+  <footer>
+    <div class="container">
+      <p>EasyLang Documentation &nbsp;·&nbsp; Built with ❤️ &nbsp;·&nbsp; 2026</p>
+    </div>
+  </footer>
+</div>
+
+<script>
+function searchDocs(query) {
+  const q = query.toLowerCase().trim();
+  document.querySelectorAll('.doc-section').forEach(sec => {
+    if (!q) { sec.classList.remove('hidden'); return; }
+    const text = sec.textContent.toLowerCase();
+    sec.classList.toggle('hidden', !text.includes(q));
+  });
+}
+</script>
+</body>
+</html>

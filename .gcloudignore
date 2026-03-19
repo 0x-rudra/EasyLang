@@ -1,0 +1,24 @@
+# This file specifies files that are not uploaded to Cloud Run
+
+# Git
+.git
+.gitignore
+
+# Dependencies
+node_modules/
+
+# Testing
+test_simple.js
+test_lang.js
+
+# Development
+.DS_Store
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Build files
+dist/
+build/

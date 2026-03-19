@@ -1,0 +1,13 @@
+{
+  "name": "easylang",
+  "version": "1.0.0",
+  "description": "EasyLang - The Friendliest Programming Language",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node -e \"console.log('No tests configured')\""
+  },
+  "keywords": ["language", "interpreter", "programming"],
+  "author": "EasyLang",
+  "license": "MIT"
+}

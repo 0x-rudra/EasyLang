@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EasyLang Examples — Sample Programs</title>
+  <meta name="description" content="Browse ready-to-run EasyLang example programs. From Hello World to recursive Fibonacci and FizzBuzz.">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .examples-header { text-align:center; margin-bottom:3rem; }
+    .filter-bar {
+      display:flex; flex-wrap:wrap; gap:0.5rem; justify-content:center;
+      margin-bottom:2rem;
+    }
+    .filter-btn {
+      padding:0.4rem 1rem; border-radius:9999px;
+      background:var(--bg-glass); border:1px solid var(--border);
+      color:var(--text-secondary); font-family:var(--font-sans);
+      font-size:0.85rem; font-weight:500; cursor:pointer;
+      transition:all var(--transition);
+    }
+    .filter-btn.active, .filter-btn:hover {
+      background:rgba(124,58,237,0.15); border-color:rgba(124,58,237,0.4);
+      color:var(--text-accent);
+    }
+    .example-card { cursor:default; }
+    .example-card-code {
+      font-family:var(--font-mono); font-size:0.78rem;
+      line-height:1.6; padding:1rem 1.25rem;
+      background:rgba(0,0,0,0.3);
+      max-height:160px; overflow:hidden;
+      position:relative;
+    }
+    .example-card-code::after {
+      content:'';
+      position:absolute; bottom:0; left:0; right:0; height:40px;
+      background:linear-gradient(transparent, rgba(13,17,23,0.95));
+    }
+    .example-card-title { font-size:1rem; font-weight:700; }
+    .example-card-desc { font-size:0.8rem; color:var(--text-muted); flex:1; }
+    .open-btn {
+      display:inline-flex; align-items:center; gap:0.4rem;
+      padding:0.4rem 0.9rem;
+      background:var(--gradient-hero); border:none; border-radius:9999px;
+      color:#fff; font-family:var(--font-sans); font-size:0.8rem;
+      font-weight:600; cursor:pointer; transition:all var(--transition);
+      text-decoration:none;
+    }
+    .open-btn:hover { transform:translateY(-1px); box-shadow:0 4px 15px rgba(124,58,237,0.4); color:#fff; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="navbar-brand"><div class="logo-icon">E</div>EasyLang</a>
+  <ul class="navbar-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="editor.html">Editor</a></li>
+    <li><a href="docs.html">Docs</a></li>
+    <li><a href="examples.html" class="active">Examples</a></li>
+  </ul>
+  <a href="editor.html" class="btn btn-primary">▶ Open Editor</a>
+</nav>
+
+<div class="page-wrapper">
+  <div class="container section">
+    <div class="examples-header">
+      <div class="section-label" style="margin:0 auto 1rem;">🎮 Examples</div>
+      <h1>Ready-to-Run <span class="text-gradient">Programs</span></h1>
+      <p style="max-width:520px;margin:0.75rem auto 0;">Click any example to open it in the editor. Learn by reading, editing, and running real code.</p>
+    </div>
+
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterExamples('all', this)">All</button>
+      <button class="filter-btn" onclick="filterExamples('basics', this)">Basics</button>
+      <button class="filter-btn" onclick="filterExamples('loops', this)">Loops</button>
+      <button class="filter-btn" onclick="filterExamples('functions', this)">Functions</button>
+      <button class="filter-btn" onclick="filterExamples('lists', this)">Lists</button>
+      <button class="filter-btn" onclick="filterExamples('algorithms', this)">Algorithms</button>
+    </div>
+
+    <div class="examples-grid" id="examples-grid"></div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <p>EasyLang Examples &nbsp;·&nbsp; Built with ❤️ &nbsp;·&nbsp; 2026</p>
+    </div>
+  </footer>
+</div>
+
+<script>
+const EXAMPLES = [
+  {
+    title: 'Hello, World!',
+    desc: 'Your very first EasyLang program.',
+    tag: 'basics', badge: 'Beginner', badgeClass: 'badge-green',
+    code: `say "Hello, World!"\nsay "Welcome to EasyLang!"`,
+    key: 'hello'
+  },
+  {
+    title: 'Variables & Arithmetic',
+    desc: 'Create variables and do math.',
+    tag: 'basics', badge: 'Beginner', badgeClass: 'badge-green',
+    code: `set a to 15\nset b to 4\n\nsay "Sum: " + (a + b)\nsay "Product: " + (a * b)\nsay "Power: " + (a ^ 2)`,
+    key: 'arith'
+  },
+  {
+    title: 'Grade Calculator',
+    desc: 'Use if/elseif/else to assign letter grades.',
+    tag: 'basics', badge: 'Beginner', badgeClass: 'badge-green',
+    code: `set score to 85\n\nif score >= 90\n  say "A"\nelseif score >= 80\n  say "B"\nelseif score >= 70\n  say "C"\nelse\n  say "F"\nend`,
+    key: 'conditionals'
+  },
+  {
+    title: 'Count From 1 to 10',
+    desc: 'Basic loop with the loop...from...to syntax.',
+    tag: 'loops', badge: 'Beginner', badgeClass: 'badge-green',
+    code: `loop i from 1 to 10\n  say i\nend`,
+    key: 'loop'
+  },
+  {
+    title: 'Repeat & While Loop',
+    desc: 'Demonstrates both repeat and while loop.',
+    tag: 'loops', badge: 'Beginner', badgeClass: 'badge-green',
+    code: `repeat 3\n  say "Knock!"\nend\n\nset n to 1\nwhile n <= 16\n  set n to n * 2\nend\nsay "Final: " + n`,
+    key: 'while'
+  },
+  {
+    title: 'Functions',
+    desc: 'Define and call reusable functions with parameters.',
+    tag: 'functions', badge: 'Intermediate', badgeClass: 'badge-cyan',
+    code: `define greet with name\n  say "Hello, " + name + "!"\nend\n\ncall greet with "Alice"\ncall greet with "Bob"`,
+    key: 'functions'
+  },
+  {
+    title: 'Lists & Operations',
+    desc: 'Create lists, add/remove items, and use built-ins.',
+    tag: 'lists', badge: 'Intermediate', badgeClass: 'badge-cyan',
+    code: `set nums to list 3, 1, 4, 1, 5, 9, 2, 6\nsay "Original: " + nums\nsay "Sorted: " + (sorted of nums)\nsay "Sum: " + (sum of nums)\nsay "Length: " + (length of nums)`,
+    key: 'lists'
+  },
+  {
+    title: 'FizzBuzz',
+    desc: 'The classic interview problem. Print 1–20, replacing multiples.',
+    tag: 'algorithms', badge: 'Intermediate', badgeClass: 'badge-cyan',
+    code: `loop i from 1 to 20\n  if i % 15 == 0\n    say "FizzBuzz"\n  elseif i % 3 == 0\n    say "Fizz"\n  elseif i % 5 == 0\n    say "Buzz"\n  else\n    say i\n  end\nend`,
+    key: 'fizzbuzz'
+  },
+  {
+    title: 'Fibonacci Sequence',
+    desc: 'Recursive Fibonacci using user-defined functions.',
+    tag: 'algorithms', badge: 'Advanced', badgeClass: 'badge-purple',
+    code: `define fib with n\n  if n <= 1\n    return n\n  end\n  return (fib with n - 1) + (fib with n - 2)\nend\n\nloop i from 0 to 10\n  say "fib(" + i + ") = " + (fib with i)\nend`,
+    key: 'fibonacci'
+  },
+  {
+    title: 'Factorial',
+    desc: 'Compute factorials recursively from 1! to 10!.',
+    tag: 'algorithms', badge: 'Advanced', badgeClass: 'badge-purple',
+    code: `define factorial with n\n  if n <= 1\n    return 1\n  end\n  return n * (factorial with n - 1)\nend\n\nloop i from 1 to 10\n  say i + "! = " + (factorial with i)\nend`,
+    key: 'factorial'
+  },
+  {
+    title: 'String Operations',
+    desc: 'Explore built-in string manipulation.',
+    tag: 'basics', badge: 'Beginner', badgeClass: 'badge-green',
+    code: `set name to "EasyLang"\nsay uppercase of name\nsay lowercase of name\nsay length of name\nsay "Type: " + (type of name)`,
+    key: 'strings_ops'
+  },
+  {
+    title: 'Prime Checker',
+    desc: 'Check if numbers from 2 to 30 are prime.',
+    tag: 'algorithms', badge: 'Advanced', badgeClass: 'badge-purple',
+    code: `define is_prime with n\n  if n < 2\n    return false\n  end\n  loop i from 2 to (floor of (sqrt of n))\n    if n % i == 0\n      return false\n    end\n  end\n  return true\nend\n\nloop i from 2 to 30\n  if is_prime with i\n    say i + " is prime"\n  end\nend`,
+    key: 'primes'
+  },
+];
+
+// Store custom examples too
+const EXTRA_CODES = {
+  strings_ops: `set name to "EasyLang"\nsay uppercase of name\nsay lowercase of name\nsay length of name\nsay "Type: " + (type of name)`,
+  primes: `define is_prime with n\n  if n < 2\n    return false\n  end\n  loop i from 2 to (floor of (sqrt of n))\n    if n % i == 0\n      return false\n    end\n  end\n  return true\nend\n\nloop i from 2 to 30\n  if is_prime with i\n    say i + " is prime"\n  end\nend`,
+};
+
+function renderExamples(filter) {
+  const grid = document.getElementById('examples-grid');
+  const list = filter === 'all' ? EXAMPLES : EXAMPLES.filter(e => e.tag === filter);
+  grid.innerHTML = list.map(ex => `
+    <div class="example-card card" data-tag="${ex.tag}">
+      <div class="example-card-header">
+        <div>
+          <div class="example-card-title">${ex.title}</div>
+          <div class="example-card-desc">${ex.desc}</div>
+        </div>
+        <span class="badge ${ex.badgeClass}" style="flex-shrink:0">${ex.badge}</span>
+      </div>
+      <div class="example-card-body">
+        <pre class="example-card-code">${escapeHtml(ex.code)}</pre>
+      </div>
+      <div class="example-card-footer">
+        <span style="font-size:0.75rem;color:var(--text-muted);">#${ex.tag}</span>
+        <button class="open-btn" onclick="openInEditor('${ex.key}', \`${ex.code.replace(/`/g, '\\`')}\`)">▶ Open in Editor</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterExamples(tag, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderExamples(tag);
+}
+
+function openInEditor(key, code) {
+  try { localStorage.setItem('easylang_code', code); } catch {}
+  window.location.href = 'editor.html';
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+renderExamples('all');
+</script>
+</body>
+</html>

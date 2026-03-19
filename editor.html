@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EasyLang Editor — Write & Run Code</title>
+  <meta name="description" content="Write and run EasyLang code directly in your browser. Real-time syntax highlighting, instant output, and friendly error messages.">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { overflow: hidden; }
+
+    /* ── Editor Layout ────────────────────────────── */
+    .editor-page {
+      display: flex; flex-direction: column;
+      height: 100vh; padding-top: 64px;
+    }
+
+    .editor-toolbar {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.6rem 1rem;
+      background: rgba(8,11,20,0.9);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+      flex-shrink: 0;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .toolbar-left { display: flex; align-items: center; gap: 0.5rem; flex: 1; min-width: 0; }
+    .toolbar-right { display: flex; align-items: center; gap: 0.5rem; }
+
+    #example-select {
+      background: var(--bg-glass);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      font-family: var(--font-sans); font-size: 0.85rem;
+      padding: 0.4rem 0.75rem;
+      cursor: pointer; outline: none;
+      max-width: 200px;
+    }
+    #example-select option { background: #1a1f2e; }
+
+    .editor-main {
+      display: grid; grid-template-columns: 1fr 1fr;
+      flex: 1; min-height: 0; overflow: hidden;
+    }
+
+    @media (max-width: 768px) {
+      .editor-main { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+      body { overflow: auto; }
+      .editor-page { height: auto; }
+    }
+
+    /* ── Code Pane ────────────────────────────────── */
+    .code-pane {
+      display: flex; flex-direction: column;
+      border-right: 1px solid var(--border);
+      min-height: 0; overflow: hidden;
+    }
+
+    .pane-header {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.6rem 1rem;
+      background: rgba(255,255,255,0.02);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .pane-title {
+      font-size: 0.78rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--text-muted);
+    }
+    .pane-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-purple); }
+
+    /* ── Editor Wrapper with line numbers ────────── */
+    .editor-wrapper {
+      display: flex; flex: 1; min-height: 0; overflow: hidden;
+      position: relative;
+    }
+
+    #line-numbers {
+      padding: 1rem 0.75rem 1rem 1rem;
+      font-family: var(--font-mono); font-size: 0.875rem;
+      line-height: 1.75;
+      color: var(--text-muted);
+      text-align: right;
+      user-select: none;
+      white-space: pre;
+      background: rgba(0,0,0,0.2);
+      border-right: 1px solid var(--border);
+      min-width: 48px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    #code-editor {
+      flex: 1;
+      padding: 1rem;
+      font-family: var(--font-mono); font-size: 0.875rem;
+      line-height: 1.75;
+      background: transparent;
+      color: var(--text-primary);
+      border: none; outline: none; resize: none;
+      overflow-y: auto;
+      tab-size: 2;
+      white-space: pre;
+      overflow-wrap: normal;
+      overflow-x: auto;
+      caret-color: var(--accent-purple);
+    }
+
+    #code-editor::placeholder { color: var(--text-muted); font-style: italic; }
+
+    /* Highlight overlay */
+    .editor-highlight-layer {
+      position: absolute; top: 0; left: 48px; right: 0; bottom: 0;
+      padding: 1rem;
+      font-family: var(--font-mono); font-size: 0.875rem;
+      line-height: 1.75;
+      pointer-events: none;
+      white-space: pre;
+      overflow: hidden;
+      color: transparent;
+      word-spacing: normal;
+    }
+
+    /* ── Output Pane ──────────────────────────────── */
+    .output-pane {
+      display: flex; flex-direction: column;
+      min-height: 0; overflow: hidden;
+    }
+
+    #output-area {
+      flex: 1; overflow-y: auto;
+      padding: 1rem;
+      font-family: var(--font-mono); font-size: 0.875rem;
+      line-height: 1.7;
+    }
+
+    .out-line { display: block; padding: 0.1rem 0; }
+    .out-normal { color: #e2e8f0; }
+    .out-error { color: #f87171; }
+    .out-error::before { content: '⚠ '; }
+    .out-success { color: #6ee7b7; }
+    .out-info { color: #67e8f9; }
+    .out-prompt { color: #a78bfa; }
+    .out-system { color: var(--text-muted); font-style: italic; }
+
+    /* ── Run Button ───────────────────────────────── */
+    .btn-run {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.5rem 1.25rem;
+      background: var(--gradient-hero);
+      border: none; border-radius: var(--radius-full);
+      color: white; font-family: var(--font-sans);
+      font-size: 0.875rem; font-weight: 700;
+      cursor: pointer;
+      transition: all var(--transition);
+      box-shadow: 0 3px 12px rgba(124,58,237,0.4);
+      white-space: nowrap;
+    }
+    .btn-run:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(124,58,237,0.5);
+    }
+    .btn-run:active { transform: scale(0.97); }
+    .btn-run.running { animation: pulse-glow 1s infinite; }
+
+    .btn-clear {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.45rem 0.9rem;
+      background: var(--bg-glass); border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      color: var(--text-secondary); font-family: var(--font-sans);
+      font-size: 0.8rem; font-weight: 500;
+      cursor: pointer; transition: all var(--transition);
+    }
+    .btn-clear:hover { background: var(--bg-glass-hover); color: var(--text-primary); }
+
+    .btn-share {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.45rem 0.9rem;
+      background: var(--bg-glass); border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      color: var(--text-secondary); font-family: var(--font-sans);
+      font-size: 0.8rem; font-weight: 500;
+      cursor: pointer; transition: all var(--transition);
+    }
+    .btn-share:hover { border-color: rgba(6,182,212,0.4); color: var(--accent-cyan); }
+
+    /* ── Status Bar ────────────────────────────────── */
+    .status-bar {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 0.35rem 1rem;
+      font-size: 0.75rem; color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      background: rgba(0,0,0,0.2);
+      flex-shrink: 0;
+    }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); }
+    .status-dot.ready { background: var(--accent-green); }
+    .status-dot.running { background: var(--accent-yellow); animation: pulse-glow 0.8s infinite; }
+    .status-dot.error { background: #ef4444; }
+
+    /* ── Keyboard Shortcut Tips ─────────────────── */
+    .shortcut {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      padding: 0.15rem 0.4rem;
+      background: rgba(255,255,255,0.06);
+      border-radius: 3px;
+      font-family: var(--font-mono);
+    }
+
+    /* ── Input Prompt ─────────────────────────────── */
+    .prompt-overlay { display: none; }
+    .prompt-overlay.visible { display: flex; }
+  </style>
+</head>
+<body>
+
+<!-- ═══ NAVIGATION ═══════════════════════════════════════ -->
+<nav class="navbar">
+  <a href="index.html" class="navbar-brand">
+    <div class="logo-icon">E</div>
+    EasyLang
+  </a>
+  <ul class="navbar-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="editor.html" class="active">Editor</a></li>
+    <li><a href="docs.html">Docs</a></li>
+    <li><a href="examples.html">Examples</a></li>
+  </ul>
+  <a href="docs.html" class="btn btn-secondary" style="font-size:0.8rem;padding:0.4rem 0.9rem;">📖 Docs</a>
+</nav>
+
+<!-- ═══ EDITOR LAYOUT ════════════════════════════════════ -->
+<div class="editor-page">
+
+  <!-- Toolbar -->
+  <div class="editor-toolbar">
+    <div class="toolbar-left">
+      <button class="btn-run" id="run-btn" onclick="runCode()">▶ Run</button>
+      <button class="btn-clear" onclick="clearOutput()">🗑 Clear</button>
+      <button class="btn-clear" onclick="clearCode()">📄 New</button>
+      <button class="btn-share" onclick="shareCode()" title="Copy shareable link">🔗 Share</button>
+    </div>
+    <div class="toolbar-right">
+      <select id="example-select" onchange="loadExample(this.value)">
+        <option value="">— Load Example —</option>
+        <option value="hello">Hello World</option>
+        <option value="arith">Arithmetic</option>
+        <option value="conditionals">Conditionals</option>
+        <option value="loop">Loop Counter</option>
+        <option value="while">While Loop</option>
+        <option value="functions">Functions</option>
+        <option value="lists">Lists</option>
+        <option value="fibonacci">Fibonacci</option>
+        <option value="fizzbuzz">FizzBuzz</option>
+        <option value="factorial">Factorial</option>
+      </select>
+      <kbd class="shortcut" title="Keyboard shortcut">Ctrl+Enter</kbd>
+    </div>
+  </div>
+
+  <!-- Main Split Pane -->
+  <div class="editor-main">
+
+    <!-- ── Code Pane ── -->
+    <div class="code-pane">
+      <div class="pane-header">
+        <div class="pane-dot"></div>
+        <span class="pane-title">Code</span>
+        <span style="margin-left:auto;font-size:0.75rem;color:var(--text-muted);" id="cursor-pos">Ln 1, Col 1</span>
+      </div>
+      <div class="editor-wrapper">
+        <div id="line-numbers">1</div>
+        <textarea
+          id="code-editor"
+          spellcheck="false"
+          autocorrect="off"
+          autocapitalize="off"
+          placeholder="# Write your EasyLang code here...
+# Press Ctrl+Enter or click Run to execute
+
+say &quot;Hello, World!&quot;"
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- ── Output Pane ── -->
+    <div class="output-pane">
+      <div class="pane-header" style="justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <div class="pane-dot" style="background:var(--accent-cyan);"></div>
+          <span class="pane-title">Output</span>
+        </div>
+        <button onclick="clearOutput()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.75rem;" title="Clear output">✕ clear</button>
+      </div>
+      <div id="output-area">
+        <span class="out-line out-system">// EasyLang v1.0 — Ready to run. Press Ctrl+Enter or click ▶ Run</span>
+      </div>
+      <div class="status-bar">
+        <div class="status-dot ready" id="status-dot"></div>
+        <span id="status-text">Ready</span>
+        <span style="margin-left:auto;" id="run-time"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ INPUT PROMPT OVERLAY ════════════════════════════ -->
+<div class="prompt-overlay" id="prompt-overlay">
+  <div class="prompt-box">
+    <h3>Program needs input</h3>
+    <p id="prompt-question">Enter a value:</p>
+    <input type="text" class="prompt-input" id="prompt-input" placeholder="Type here and press Enter..." />
+    <div style="display:flex;gap:0.5rem;justify-content:flex-end;">
+      <button class="btn btn-primary" id="prompt-submit" onclick="submitPrompt()">Submit</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TOAST ════════════════════════════════════════════ -->
+<div class="toast toast-hidden" id="toast">
+  <span id="toast-icon">✅</span>
+  <span id="toast-msg">Link copied!</span>
+</div>
+
+<!-- ── Language Engine ── -->
+<script src="lang/lexer.js"></script>
+<script src="lang/parser.js"></script>
+<script src="lang/interpreter.js"></script>
+<script src="editor.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EasyLang — The Friendliest Programming Language</title>
+  <meta name="description" content="EasyLang is a minimalist programming language that reads like plain English. Zero setup, runs in your browser. Perfect for beginners and rapid prototyping.">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── Hero ────────────────────────────────── */
+    .hero {
+      min-height: calc(100vh - 72px);
+      display: flex; align-items: center;
+      padding: 4rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 30% 60%, rgba(124,58,237,0.18) 0%, transparent 55%),
+                  radial-gradient(ellipse at 75% 35%, rgba(6,182,212,0.14) 0%, transparent 55%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      max-width: 640px;
+      position: relative; z-index: 1;
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      background: rgba(124,58,237,0.12);
+      border: 1px solid rgba(124,58,237,0.3);
+      border-radius: 9999px;
+      font-size: 0.8rem; font-weight: 600;
+      color: #a78bfa;
+      margin-bottom: 1.5rem;
+      animation: fadeInUp 0.5s ease both;
+    }
+
+    .hero h1 {
+      line-height: 1.08;
+      margin-bottom: 1.2rem;
+      animation: fadeInUp 0.5s 0.1s ease both;
+    }
+
+    .hero p {
+      font-size: 1.15rem; max-width: 520px;
+      margin-bottom: 2rem;
+      animation: fadeInUp 0.5s 0.2s ease both;
+    }
+
+    .hero-actions {
+      display: flex; flex-wrap: wrap; gap: 0.75rem;
+      animation: fadeInUp 0.5s 0.3s ease both;
+    }
+
+    .hero-preview {
+      flex: 1; min-width: 340px; max-width: 560px;
+      position: relative; z-index: 1;
+    }
+
+    .hero-grid {
+      display: flex; gap: 3rem; align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .preview-window {
+      background: rgba(0,0,0,0.45);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg), 0 0 40px rgba(124,58,237,0.2);
+      animation: float 4s ease-in-out infinite;
+    }
+
+    .preview-titlebar {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      background: rgba(255,255,255,0.04);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .preview-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+    }
+    .preview-dot.red   { background: #ef4444; }
+    .preview-dot.yellow{ background: #f59e0b; }
+    .preview-dot.green { background: #10b981; }
+
+    .preview-title { margin-left: 0.5rem; font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono); }
+
+    .preview-code {
+      padding: 1.25rem 1.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      line-height: 1.75;
+    }
+
+    .preview-output {
+      background: rgba(16,185,129,0.06);
+      border-top: 1px solid rgba(16,185,129,0.15);
+      padding: 1rem 1.5rem;
+      font-family: var(--font-mono); font-size: 0.875rem;
+      color: #6ee7b7;
+    }
+
+    .preview-output span { opacity: 0.6; color: var(--text-muted); }
+
+    /* ── Stats ────────────────────────────────── */
+    .stats-bar {
+      display: flex; flex-wrap: wrap; gap: 2rem;
+      padding: 2rem 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 5rem;
+    }
+
+    .stat { text-align: center; }
+    .stat-value {
+      font-size: 2rem; font-weight: 800;
+      background: var(--gradient-hero);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-label { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem; }
+
+    /* ── Compare Section ─────────────────────── */
+    .compare-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+    }
+    @media (max-width: 768px) { .compare-grid { grid-template-columns: 1fr; } }
+
+    .compare-card { border-radius: var(--radius-lg); overflow: hidden; }
+    .compare-header {
+      padding: 0.75rem 1.25rem;
+      display: flex; align-items: center; gap: 0.5rem; font-weight: 600; font-size: 0.9rem;
+    }
+    .compare-header.python { background: rgba(245,158,11,0.15); color: #fcd34d; }
+    .compare-header.easylang { background: rgba(124,58,237,0.15); color: #a78bfa; }
+    .compare-header.js { background: rgba(6,182,212,0.15); color: #67e8f9; }
+
+    /* ── Testimonial ─────────────────────────── */
+    .testimonial-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .testimonial {
+      background: var(--bg-glass);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      transition: all var(--transition);
+    }
+    .testimonial:hover { border-color: rgba(124,58,237,0.3); }
+    .testimonial-text { font-style: italic; margin-bottom: 1rem; color: var(--text-secondary); }
+    .testimonial-author {
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .testimonial-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--gradient-hero);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.9rem; color: white;
+    }
+    .testimonial-name { font-weight: 600; font-size: 0.9rem; }
+    .testimonial-role { font-size: 0.8rem; color: var(--text-muted); }
+
+    /* ── CTA Section ──────────────────────────── */
+    .cta-section {
+      text-align: center;
+      padding: 5rem 0;
+      position: relative;
+    }
+    .cta-section::before {
+      content:'';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 50%, rgba(124,58,237,0.12) 0%, transparent 70%);
+    }
+    .cta-section > * { position: relative; z-index: 1; }
+    .cta-section h2 { margin-bottom: 1rem; }
+    .cta-section p { margin-bottom: 2rem; }
+
+    /* ── Step Flow ────────────────────────────── */
+    .steps { display: flex; flex-direction: column; gap: 1.5rem; }
+    .step {
+      display: flex; gap: 1.25rem; align-items: flex-start;
+    }
+    .step-num {
+      flex-shrink: 0;
+      width: 36px; height: 36px;
+      background: var(--gradient-hero);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.9rem; color: white;
+    }
+    .step-title { font-weight: 600; margin-bottom: 0.25rem; }
+    .step-desc { font-size: 0.875rem; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+<!-- ═══ NAVIGATION ═══════════════════════════════════════ -->
+<nav class="navbar">
+  <a href="index.html" class="navbar-brand">
+    <div class="logo-icon">E</div>
+    EasyLang
+  </a>
+  <ul class="navbar-links">
+    <li><a href="index.html" class="active">Home</a></li>
+    <li><a href="editor.html">Editor</a></li>
+    <li><a href="docs.html">Docs</a></li>
+    <li><a href="examples.html">Examples</a></li>
+  </ul>
+  <a href="editor.html" class="btn btn-primary">
+    ▶ Try EasyLang
+  </a>
+</nav>
+
+<!-- ═══ HERO ════════════════════════════════════════════ -->
+<div class="page-wrapper">
+  <section class="hero section">
+    <div class="container">
+      <div class="hero-grid">
+
+        <div class="hero-content">
+          <div class="hero-badge">✨ Programming for Humans</div>
+          <h1>
+            Code in<br>
+            <span class="text-gradient">Plain English.</span><br>
+            Finally.
+          </h1>
+          <p>EasyLang is a minimalist programming language where every line reads like a sentence. No setup, no nonsense — write and run code in your browser, right now.</p>
+          <div class="hero-actions">
+            <a href="editor.html" class="btn btn-primary" style="font-size:1rem; padding:0.75rem 1.75rem;">
+              ▶&nbsp; Open Editor
+            </a>
+            <a href="docs.html" class="btn btn-secondary" style="font-size:1rem; padding:0.75rem 1.75rem;">
+              📖&nbsp; Read Docs
+            </a>
+          </div>
+        </div>
+
+        <div class="hero-preview">
+          <div class="preview-window">
+            <div class="preview-titlebar">
+              <div class="preview-dot red"></div>
+              <div class="preview-dot yellow"></div>
+              <div class="preview-dot green"></div>
+              <span class="preview-title">hello.easy</span>
+            </div>
+            <div class="preview-code">
+              <span class="sh-keyword">set</span> name <span class="sh-keyword">to</span> <span class="sh-string">"Alice"</span><br>
+              <span class="sh-keyword">set</span> age <span class="sh-keyword">to</span> <span class="sh-number">20</span><br>
+              <br>
+              <span class="sh-keyword">say</span> <span class="sh-string">"Hello, "</span> + name<br>
+              <br>
+              <span class="sh-keyword">if</span> age &gt;= <span class="sh-number">18</span><br>
+              &nbsp;&nbsp;<span class="sh-keyword">say</span> <span class="sh-string">"You are an adult!"</span><br>
+              <span class="sh-keyword">end</span><br>
+              <br>
+              <span class="sh-keyword">loop</span> i <span class="sh-keyword">from</span> <span class="sh-number">1</span> <span class="sh-keyword">to</span> <span class="sh-number">3</span><br>
+              &nbsp;&nbsp;<span class="sh-keyword">say</span> <span class="sh-string">"Count: "</span> + i<br>
+              <span class="sh-keyword">end</span>
+            </div>
+            <div class="preview-output">
+              <span>▶ Output</span><br>
+              Hello, Alice<br>
+              You are an adult!<br>
+              Count: 1<br>
+              Count: 2<br>
+              Count: 3
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ STATS ══════════════════════════════════════════ -->
+  <div class="container">
+    <div class="stats-bar">
+      <div class="stat"><div class="stat-value">12</div><div class="stat-label">Keywords to learn</div></div>
+      <div class="stat"><div class="stat-value">0ms</div><div class="stat-label">Setup time</div></div>
+      <div class="stat"><div class="stat-value">100%</div><div class="stat-label">Browser-based</div></div>
+      <div class="stat"><div class="stat-value">∞</div><div class="stat-label">Possibilities</div></div>
+    </div>
+  </div>
+
+  <!-- ═══ FEATURES ════════════════════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">⚡ Why EasyLang</div>
+      <h2 class="section-title">Built for <span class="text-gradient">clarity first</span></h2>
+      <p class="section-desc">Every design decision makes sense from a beginner's perspective.</p>
+      <div class="feature-grid">
+        <div class="card card-gradient">
+          <div class="feature-icon">🗣️</div>
+          <h3>Plain English Syntax</h3>
+          <p>Write <code>set x to 10</code>, not <code>var x = 10;</code>. Every line is readable by anyone.</p>
+        </div>
+        <div class="card card-gradient">
+          <div class="feature-icon">🚀</div>
+          <h3>Zero Setup</h3>
+          <p>Runs 100% in your browser. No installations, no terminals, no configuration files.</p>
+        </div>
+        <div class="card card-gradient">
+          <div class="feature-icon">❤️</div>
+          <h3>Friendly Errors</h3>
+          <p>Errors tell you what went wrong in plain English — "Did you forget to define x first?"</p>
+        </div>
+        <div class="card card-gradient">
+          <div class="feature-icon">⚡</div>
+          <h3>Instant Feedback</h3>
+          <p>Hit Run and see results immediately. The editor highlights syntax in real-time.</p>
+        </div>
+        <div class="card card-gradient">
+          <div class="feature-icon">🔋</div>
+          <h3>Batteries Included</h3>
+          <p>Built-in support for lists, strings, math, loops, functions — everything you need to start.</p>
+        </div>
+        <div class="card card-gradient">
+          <div class="feature-icon">📚</div>
+          <h3>Great Docs</h3>
+          <p>Searchable reference with examples for every feature. Learn by doing.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ COMPARE ══════════════════════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">🆚 Comparison</div>
+      <h2 class="section-title">Simpler than <span class="text-gradient">anything</span> you've seen</h2>
+      <p class="section-desc">Print numbers 1–5 in different languages:</p>
+      <div class="compare-grid">
+        <div class="compare-card card">
+          <div class="compare-header python">🐍 Python</div>
+          <div class="code-block" style="border-radius:0; border:none;">
+            <span class="kw">for</span> i <span class="kw">in</span> range(1, 6):<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">print</span>(i)
+          </div>
+        </div>
+        <div class="compare-card card" style="border-color:rgba(124,58,237,0.4);">
+          <div class="compare-header easylang">✨ EasyLang</div>
+          <div class="code-block" style="border-radius:0; border:none;">
+            <span class="kw">loop</span> i <span class="kw">from</span> <span class="num">1</span> <span class="kw">to</span> <span class="num">5</span><br>
+            &nbsp;&nbsp;<span class="kw">say</span> i<br>
+            <span class="kw">end</span>
+          </div>
+        </div>
+        <div class="compare-card card">
+          <div class="compare-header js">⚡ JavaScript</div>
+          <div class="code-block" style="border-radius:0; border:none;">
+            <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">1</span>; i &lt;= <span class="num">5</span>; i++) {<br>
+            &nbsp;&nbsp;<span class="fn">console</span>.<span class="fn">log</span>(i);<br>
+            }
+          </div>
+        </div>
+        <div class="compare-card card">
+          <div class="compare-header" style="background:rgba(16,185,129,0.12);color:#6ee7b7;">✅ Why EasyLang wins</div>
+          <div style="padding:1rem 1.5rem">
+            <div class="steps">
+              <div class="step">
+                <div class="step-num">1</div>
+                <div><div class="step-title">No punctuation clutter</div><div class="step-desc">No colons, semicolons, or curly braces to remember</div></div>
+              </div>
+              <div class="step">
+                <div class="step-num">2</div>
+                <div><div class="step-title">Reads like a sentence</div><div class="step-desc">"loop i from 1 to 5" tells you exactly what it does</div></div>
+              </div>
+              <div class="step">
+                <div class="step-num">3</div>
+                <div><div class="step-title">Beginner-proof</div><div class="step-desc">No way to write a syntax error by accident</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ TESTIMONIALS ════════════════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">💬 Community</div>
+      <h2 class="section-title" style="margin-bottom:2rem;">What learners <span class="text-gradient">are saying</span></h2>
+      <div class="testimonial-grid">
+        <div class="testimonial">
+          <p class="testimonial-text">"I tried Python and gave up after semicolons. EasyLang clicked in 20 minutes. I wrote my first real program today."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">R</div>
+            <div><div class="testimonial-name">Riya S.</div><div class="testimonial-role">1st year CS student</div></div>
+          </div>
+        </div>
+        <div class="testimonial">
+          <p class="testimonial-text">"Teaching coding to 10-year-olds was impossible before. EasyLang made it fun. They were writing loops and functions by day 2."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">P</div>
+            <div><div class="testimonial-name">Priya M.</div><div class="testimonial-role">Coding instructor</div></div>
+          </div>
+        </div>
+        <div class="testimonial">
+          <p class="testimonial-text">"The friendly errors are a game-changer. Instead of a red wall of text, I get a helpful hint. This is how it should be."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">A</div>
+            <div><div class="testimonial-name">Arjun K.</div><div class="testimonial-role">Self-taught developer</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CTA ═════════════════════════════════════════════ -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="section-label" style="margin:0 auto 1.5rem;">🎯 Get Started Free</div>
+      <h2>Ready to write your<br><span class="text-gradient">first line of code?</span></h2>
+      <p>No account needed. Open the editor and start coding in 10 seconds.</p>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+        <a href="editor.html" class="btn btn-primary" style="font-size:1.05rem;padding:0.8rem 2rem;">▶ Open Editor</a>
+        <a href="examples.html" class="btn btn-secondary" style="font-size:1.05rem;padding:0.8rem 2rem;">🎮 See Examples</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══════════════════════════════════════════ -->
+  <footer>
+    <div class="container">
+      <p>EasyLang — Designed for Humans &nbsp;·&nbsp; Built with ❤️ &nbsp;·&nbsp; 2026</p>
+    </div>
+  </footer>
+</div>
+
+<script src="main.js"></script>
+</body>
+</html>
